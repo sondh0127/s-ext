@@ -1,7 +1,7 @@
 {
   "private": true,
-  "name": "svelte-tailwind-extension-boilerplate",
-  "version": "0.0.1",
+  "name": "s-interactive",
+  "version": "0.0.2",
   "description": "A browser extension template built with Svelte and TailwindCSS",
   "keywords": [
     "chrome-extension",
@@ -11,13 +11,13 @@
     "rollup",
     "boilerplate"
   ],
-  "homepage": "https://github.com/kyrelldixon/svelte-tailwind-extension-boilerplate#readme",
+  "homepage": "https://github.com/kyrelldixon/s-interactive#readme",
   "bugs": {
-    "url": "https://github.com/kyrelldixon/svelte-tailwind-extension-boilerplate/issues"
+    "url": "https://github.com/kyrelldixon/s-interactive/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kyrelldixon/svelte-tailwind-extension-boilerplate.git"
+    "url": "git+https://github.com/kyrelldixon/s-interactive.git"
   },
   "author": "Kyrell Dixon <kyrell@kyrelldixon.com>",
   "license": "MIT",

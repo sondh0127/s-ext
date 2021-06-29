@@ -4,6 +4,7 @@
   let winingUsers = []
 
   let overlayId = ``
+  let length = 100
 
   const fetchData = async (id, backdoorToken) => {
     const request = await fetch(
@@ -35,7 +36,8 @@
 
   $: answerTheSameList = winingUsers?.map((item) => {
     return `${item.userId}, ${item.answerTheSame}`
-  }).join('\n')
+  }).slice(0, length).join('\n')
+
 
   $: fileName = (() => {
     const nameArr = ['DSTG']
@@ -62,16 +64,16 @@
 </script>
 
 <main class="p-4">
-	<div>
+	<div class="text-base mb-1">
 		Tổng số: <span class="text-lg font-semibold"> {winingUsers?.length}</span>
 	</div>
 	<div class="flex flex-col space-y-2">
 		<div class="relative">
-			<span> ID: </span>
+			<div class="text-base mb-1">ID: (Copy overlayID từ CMS)</div>
 			<input
 				type="text"
 				bind:value={overlayId}
-				class=" rounded-lg border-transparent flex-1 appearance-none border border-gray-300 w-full py-2 px-4 bg-white text-gray-700 placeholder-gray-400 shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+				class=" rounded-lg border-transparent flex-1 appearance-none border border-gray-300 w-full py-1 px-3 bg-white text-gray-700 placeholder-gray-400 shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
 				placeholder="Nhập overlay ID"
 			/>
 		</div>
@@ -84,7 +86,15 @@
 		>
 			Fetch
 		</button>
-
+		<div class="relative">
+			<div class="text-base mb-1">Số lượng: (eg. 100 người đầu tiên)</div>
+			<input
+				type="text"
+				bind:value={length}
+				class=" rounded-lg border-transparent flex-1 appearance-none border border-gray-300 w-full py-1 px-3 bg-white text-gray-700 placeholder-gray-400 shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+				placeholder="Nhập độ dài"
+			/>
+		</div>
 		<a
 			class="py-1 px-3 inline-block bg-green-600 hover:bg-green-700 focus:ring-green-500 focus:ring-offset-green-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-full"
 			{href}
