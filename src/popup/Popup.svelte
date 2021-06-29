@@ -2,6 +2,7 @@
   import { storage } from '@extend-chrome/storage'
 
   let winingUsers = []
+  let template = ''
 
   let overlayId = ``
   let length = 100
@@ -19,6 +20,7 @@
     const metadata = JSON.parse(res?.data?.overlay?.metadata || {})
 
     winingUsers = metadata.winingUsers
+    template = metadata.template
     console.log('🇻🇳 ~ file: Popup.svelte ~ line 22 ~ winingUsers', winingUsers)
   }
 
@@ -35,13 +37,14 @@
   }
 
   $: answerTheSameList = winingUsers?.map((item) => {
-    return `${item.userId}, ${item.answerTheSame}`
+    return  template === 'FootbalMain' ? `${item.userId}, ${item.answerTheSame}`: `${item.userId}`
   }).slice(0, length).join('\n')
 
 
   $: fileName = (() => {
     const nameArr = ['DSTG']
-    nameArr.push('CHC')
+    nameArr.push(template === 'FootbalMain' ? 'CHC': 'CHP')
+
     const date = Date.now().toString()
     nameArr.push(date)
     return nameArr.join('_')
@@ -50,7 +53,7 @@
   let textFile = ''
 
   $: href = (() => {
-    const data = new Blob([`SĐT, Dự đoán\n`+ answerTheSameList], { type: 'text/plain' })
+    const data = new Blob([answerTheSameList], { type: 'text/plain' })
 
   if (textFile !== null) {
     window.URL.revokeObjectURL(textFile)
@@ -66,6 +69,9 @@
 <main class="p-4">
 	<div class="text-base mb-1">
 		Tổng số: <span class="text-lg font-semibold"> {winingUsers?.length}</span>
+	</div>
+	<div class="text-base mb-1">
+		Loại: <span class="text-lg font-semibold"> {template}</span>
 	</div>
 	<div class="flex flex-col space-y-2">
 		<div class="relative">
