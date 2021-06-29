@@ -37,13 +37,13 @@
   }
 
   $: answerTheSameList = winingUsers?.map((item) => {
-    return  template === 'FootbalMain' ? `${item.userId}, ${item.answerTheSame}`: `${item.userId}`
+    return  template === 'FootballMain' ? `${item.userId}, ${item.answerTheSame}`: `${item.userId}`
   }).slice(0, length).join('\n')
 
 
   $: fileName = (() => {
     const nameArr = ['DSTG']
-    nameArr.push(template === 'FootbalMain' ? 'CHC': 'CHP')
+    nameArr.push(template === 'FootballMain' ? 'CHC': 'CHP')
 
     const date = Date.now().toString()
     nameArr.push(date)

@@ -1,8 +1,8 @@
 {
   "private": true,
   "name": "s-interactive",
-  "version": "0.0.2",
-  "description": "A browser extension template built with Svelte and TailwindCSS",
+  "version": "0.0.3",
+  "description": "A browser extension for interactive",
   "keywords": [
     "chrome-extension",
     "web-extension",
@@ -11,15 +11,15 @@
     "rollup",
     "boilerplate"
   ],
-  "homepage": "https://github.com/kyrelldixon/s-interactive#readme",
+  "homepage": "https://github.com/sondh0127/s-interactive#readme",
   "bugs": {
-    "url": "https://github.com/kyrelldixon/s-interactive/issues"
+    "url": "https://github.com/sondh0127/s-interactive/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kyrelldixon/s-interactive.git"
+    "url": "git+https://github.com/sondh0127/s-interactive.git"
   },
-  "author": "Kyrell Dixon <kyrell@kyrelldixon.com>",
+  "author": "Son Hon Do <sondh0127@gmail.com>",
   "license": "MIT",
   "scripts": {
     "build": "rollup -c",
