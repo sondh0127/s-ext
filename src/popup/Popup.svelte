@@ -1,63 +1,53 @@
 <script>
   import { storage } from '@extend-chrome/storage'
 
-  let winingUsers = []
-  let interactiveUsers = []
+  let res = {
+    data: [],
+    total: 0
+  }
   let template = ''
 
-  let overlayId = ``
+  let link = ``
   let length = 100
 
-  const fetchData = async (id, backdoorToken) => {
+  const fetchData = async (link, backdoorToken) => {
+    const url = new URL(link);
+    const search_params = url.searchParams;
+
+    search_params.set('perPage', '100');
+
+    url.search = search_params.toString();
+
+    const new_url = url.toString();
+
     const request = await fetch(
-      `https://cms-on-v2.gviet.vn:8443/ilp-campaign-service/v1/overlays/${id}`,
+      new_url,
       {
         headers: {
           'X-Backdoor': `${backdoorToken}`,
         },
       },
     )
-    const res = await request.json()
-    const metadata = JSON.parse(res?.data?.overlay?.metadata || {})
+    res = await request.json()
 
-    winingUsers = metadata.winingUsers
-    template = metadata.template
   }
-
-  const fetchData2 = async (id, backdoorToken) => {
-    const request = await fetch(
-      `https://cms-on-v2.gviet.vn:8443/ilp-engagement-service/v1/stats/internal-metrics/${id}`,
-      {
-        headers: {
-          'X-Backdoor': `${backdoorToken}`,
-        },
-      },
-    )
-    const res = await request.json()
-    interactiveUsers = res?.data?.metrics?._overlay_interacted?.userIds || []
-  }
-
 
   async function refetchData() {
-    if (overlayId) {
+    if (link) {
       storage.local.get('backdoorToken').then(({ backdoorToken }) => {
-        fetchData(overlayId, backdoorToken)
-        fetchData2(overlayId, backdoorToken)
+        fetchData(link, backdoorToken)
       })
     } else {
-      alert('Nhập overlay ID!')
+      alert('Nhập link request')
     }
   }
 
-  $: answerTheSameList = winingUsers?.map((item) => {
-    return  template === 'FootballMain' ? `${item.userId}, ${item.answerTheSame}`: `${item.userId}`
-  }).slice(0, length).join('\n')
+  $: priceData = res.data.map(item => ({ userData: { phone: item.userData.phone }}))
 
 
   $: fileName = (() => {
     const nameArr = ['DSTG']
     nameArr.push(template === 'FootballMain' ? 'CHC': 'CHP')
-
     const date = Date.now().toString()
     nameArr.push(date)
     return nameArr.join('_')
@@ -66,7 +56,7 @@
   let textFile = ''
 
   $: href = (() => {
-    const data = new Blob([answerTheSameList], { type: 'text/plain' })
+    const data = new Blob([JSON.stringify(priceData, null, 2)], { type: "application/json" })
 
   if (textFile !== null) {
     window.URL.revokeObjectURL(textFile)
@@ -75,12 +65,13 @@
   return textFile
   })()
 
-  $: interactiveList = interactiveUsers.join('\n')
+  //
+  $: priceDataFull = res.data.map(item => ({ userData: { phone: item.userData.phone, interactiveTime: item.interactiveTime }}))
 
   let textFile2 = ''
 
   $: fileName2 = (() => {
-    const nameArr = ['DSTT']
+    const nameArr = ['DSFULL']
     nameArr.push(template === 'FootballMain' ? 'CHC': 'CHP')
 
     const date = Date.now().toString()
@@ -89,7 +80,7 @@
   })()
 
   $: href2 = (() => {
-    const data = new Blob([interactiveList], { type: 'text/plain' })
+    const data = new Blob([JSON.stringify(priceDataFull, null, 2)], { type: "application/json" })
 
   if (textFile2 !== null) {
     window.URL.revokeObjectURL(textFile2)
@@ -98,66 +89,65 @@
   return textFile2
   })()
 
-  $:disabled = !overlayId
+  $:disabled = !link
 
 </script>
 
 <main class="p-4">
-	<div class="mb-1 text-base">
-		Tổng số: <span class="text-lg font-semibold"> {winingUsers?.length}</span>
+	<div class="text-base mb-1">
+		Tổng số: <span class="font-semibold text-lg"> {res.total}</span>
 	</div>
-	<div class="mb-1 text-base">
-		Loại: <span class="text-lg font-semibold"> {template === 'FootballMain' ? 'CHC': 'CHP'}</span>
+	<div class="text-base mb-1">
+		Loại: <span class="font-semibold text-lg">
+			{template === 'FootballMain' ? 'CHC' : 'CHP'}</span
+		>
 	</div>
 	<div class="flex flex-col space-y-2">
 		<div class="relative">
-			<div class="mb-1 text-base">ID: (Sao chép ID từ CMS)</div>
-			<input
+			<div class="text-base mb-1">Payload</div>
+			<textarea
 				type="text"
-				bind:value={overlayId}
-				class="flex-1 w-full px-3 py-1 text-base text-gray-700 placeholder-gray-400 bg-white border border-transparent border-gray-300 rounded-lg shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-				placeholder="Nhập overlay ID"
+				rows="5"
+				bind:value={link}
+				class="bg-white border border-transparent rounded-lg border-gray-300 flex-1 shadow-sm text-base w-full py-1 px-3 placeholder-gray-400 text-gray-700 appearance-none focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-600"
+				placeholder="Nhập payload"
 			/>
 		</div>
 
+		<div class="relative">
+			<div class="text-base mb-1">Số lượng: (eg. 100 người đầu tiên)</div>
+			<input
+				type="text"
+				bind:value={length}
+				class="bg-white border border-transparent rounded-lg border-gray-300 flex-1 shadow-sm text-base w-full py-1 px-3 placeholder-gray-400 text-gray-700 appearance-none focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-600"
+				placeholder="Nhập độ dài"
+			/>
+		</div>
 		<button
 			on:click={refetchData}
 			type="button"
 			{disabled}
-			class="inline-block w-full px-3 py-1 text-base font-semibold text-center text-white transition duration-200 ease-in bg-pink-600 rounded-full shadow-md hover:bg-pink-700 focus:ring-pink-500 focus:ring-offset-pink-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
+			class="rounded-full font-semibold bg-pink-600 shadow-md text-base text-center text-white w-full py-1 px-3 transition ease-in duration-200 inline-block hover:bg-pink-700 focus:outline-none focus:ring-pink-500 focus:ring-offset-pink-200 focus:ring-2 focus:ring-offset-2"
 		>
 			Tải dữ liệu
 		</button>
-		<div class="relative">
-			<div class="mb-1 text-base">Số lượng: (eg. 100 người đầu tiên)</div>
-			<input
-				type="text"
-				bind:value={length}
-				class="flex-1 w-full px-3 py-1 text-base text-gray-700 placeholder-gray-400 bg-white border border-transparent border-gray-300 rounded-lg shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-				placeholder="Nhập độ dài"
-			/>
+		<div class="flex space-x-2">
+			<a
+				class="rounded-full flex-grow font-semibold bg-green-600 shadow-md text-base text-center text-white w-full py-1 px-3 transition ease-in duration-200 inline-block hover:bg-green-700 focus:outline-none focus:ring-green-500 focus:ring-offset-green-200 focus:ring-2 focus:ring-offset-2"
+				{href}
+				{disabled}
+				download={fileName}
+			>
+				<span> Tải DS cộng thưởng </span>
+			</a>
+			<a
+				class="rounded-full font-semibold bg-blue-600 flex-grow-0 shadow-md text-base text-center text-white w-full py-1 px-3 transition ease-in duration-200 inline-block hover:bg-blue-700 focus:outline-none focus:ring-blue-500 focus:ring-offset-blue-200 focus:ring-2 focus:ring-offset-2"
+				href={href2}
+				{disabled}
+				download={fileName2}
+			>
+				<span> Tải DS Full </span>
+			</a>
 		</div>
-		<a
-			class="inline-block w-full px-3 py-1 text-base font-semibold text-center text-white transition duration-200 ease-in bg-green-600 rounded-full shadow-md hover:bg-green-700 focus:ring-green-500 focus:ring-offset-green-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
-			{href}
-			{disabled}
-			download={fileName}
-		>
-			<span> Tải danh sách trả lời đúng </span>
-		</a>
-
-    <div class="w-full h-px bg-gray-600"> </div>
-
-    <div class="mb-1 text-base">
-      Tổng số: <span class="text-lg font-semibold"> {interactiveUsers?.length}</span>
-    </div>
-    <a
-			class="inline-block w-full px-3 py-1 text-base font-semibold text-center text-white transition duration-200 ease-in bg-purple-600 rounded-full shadow-md hover:bg-purple-700 focus:ring-purple-500 focus:ring-offset-purple-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
-			href={href2}
-			{disabled}
-			download={fileName2}
-		>
-			<span> Tải danh sách tương tác </span>
-		</a>
 	</div>
 </main>
