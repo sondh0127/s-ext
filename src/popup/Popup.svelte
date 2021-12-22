@@ -111,7 +111,7 @@
   })()
 
    //
-   $: filterData = res.data.map(item => item.userData.phone)
+   $: filterData = res.data.map(item => item.userId)
 
   let textFile3 = ''
 
@@ -203,7 +203,7 @@
 				{disabled}
 				download={fileName3}
 			>
-        Danh sách filters (Interactive CMS)
+        Danh sách ID filter (Interactive CMS)
 			</a>
 		</div>
 	</div>
