@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "s-interactive",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "A browser extension for interactive",
   "keywords": [
     "chrome-extension",
