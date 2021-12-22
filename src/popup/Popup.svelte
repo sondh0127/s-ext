@@ -9,7 +9,7 @@
   let template = ''
 
   let link = ``
-  let length = 100
+  let length = 10
 
 
 
@@ -17,13 +17,14 @@
     storage.local.set((data) => {
       return {
         ...data,
-        link
+        link,
+        length
       }
     })
     const url = new URL(link);
     const search_params = url.searchParams;
 
-    search_params.set('perPage', '100');
+    search_params.set('perPage', length);
 
     url.search = search_params.toString();
 
@@ -42,8 +43,9 @@
   }
 
   onMount(() => {
-    storage.local.get({ link: ''}).then(({ link: _link }) => {
+    storage.local.get({ link: '', length: 0 }).then(({ link: _link, length: _length }) => {
       link = _link || ''
+      length = _length || 10
       setTimeout(() => {
         storage.local.get('backdoorToken').then(({ backdoorToken }) => {
           fetchData(link, backdoorToken)
